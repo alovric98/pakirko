@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Manual dark mode via the .dark class on <html> — the app must NOT follow
+   the OS setting (PRD 5.6), so prefers-color-scheme is intentionally unused. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fbf8f3;
+  --foreground: #1e2a4a;
+  --card-sand: #f2e8d9;
+  --card-peach: #fdebd2;
+  --card-sky: #d6e9f8;
+  --card-lavender: #f3dff7;
+  --card-mint: #dcf1e3;
+}
+
+.dark {
+  --background: #12161f;
+  --foreground: #e9edf5;
+  --card-sand: #46402f;
+  --card-peach: #4e3e2b;
+  --card-sky: #2b3e52;
+  --card-lavender: #43324e;
+  --card-mint: #2e4638;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-sand: var(--card-sand);
+  --color-card-peach: var(--card-peach);
+  --color-card-sky: var(--card-sky);
+  --color-card-lavender: var(--card-lavender);
+  --color-card-mint: var(--card-mint);
+  --radius-card: 1.25rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
