@@ -1,4 +1,5 @@
-import { SCHEMA_VERSION, type AppState, type Theme } from "./types";
+import type { PaletteColor } from "./palette";
+import { SCHEMA_VERSION, type AppState, type PackingList, type Theme } from "./types";
 
 /* The only module that touches localStorage — swapping the backend later
    (e.g. Supabase) should change nothing outside this file. */
@@ -54,4 +55,24 @@ export function getTheme(): Theme {
 
 export function setTheme(theme: Theme): void {
   saveState({ ...loadState(), theme });
+}
+
+export function addList(input: {
+  name: string;
+  emoji: string;
+  color: PaletteColor;
+  tripDate: string | null;
+}): PackingList {
+  const list: PackingList = {
+    id: crypto.randomUUID(),
+    name: input.name,
+    emoji: input.emoji,
+    color: input.color,
+    tripDate: input.tripDate,
+    createdAt: new Date().toISOString(),
+    groups: [],
+  };
+  const state = loadState();
+  saveState({ ...state, lists: [...state.lists, list] });
+  return list;
 }
