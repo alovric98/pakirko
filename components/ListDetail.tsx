@@ -91,7 +91,7 @@ export function ListDetail({ id }: ListDetailProps) {
       ) : (
         <div className="flex flex-col gap-3">
           {list.groups.map((group) => (
-            <GroupSection key={group.id} group={group} />
+            <GroupSection key={group.id} group={group} listId={list.id} />
           ))}
         </div>
       )}

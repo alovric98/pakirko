@@ -3,6 +3,7 @@ import {
   SCHEMA_VERSION,
   type AppState,
   type Group,
+  type Item,
   type PackingList,
   type Theme,
 } from "./types";
@@ -104,4 +105,55 @@ export function addGroup(
   );
   saveState({ ...state, lists });
   return group;
+}
+
+export function addItem(listId: string, groupId: string, text: string): Item {
+  const item: Item = {
+    id: crypto.randomUUID(),
+    text,
+    done: false,
+    quantityEnabled: false,
+    quantity: 1,
+  };
+  const state = loadState();
+  const lists = state.lists.map((list) =>
+    list.id === listId
+      ? {
+          ...list,
+          groups: list.groups.map((group) =>
+            group.id === groupId
+              ? { ...group, items: [...group.items, item] }
+              : group,
+          ),
+        }
+      : list,
+  );
+  saveState({ ...state, lists });
+  return item;
+}
+
+export function toggleItemDone(
+  listId: string,
+  groupId: string,
+  itemId: string,
+): void {
+  const state = loadState();
+  const lists = state.lists.map((list) =>
+    list.id === listId
+      ? {
+          ...list,
+          groups: list.groups.map((group) =>
+            group.id === groupId
+              ? {
+                  ...group,
+                  items: group.items.map((item) =>
+                    item.id === itemId ? { ...item, done: !item.done } : item,
+                  ),
+                }
+              : group,
+          ),
+        }
+      : list,
+  );
+  saveState({ ...state, lists });
 }
