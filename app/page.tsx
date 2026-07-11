@@ -3,38 +3,13 @@
 import { useState, useSyncExternalStore } from "react";
 import { ListCard } from "@/components/ListCard";
 import { NewListModal } from "@/components/NewListModal";
-import { loadState } from "@/lib/storage";
+import {
+  getListsSnapshot,
+  getServerListsSnapshot,
+  invalidateListsCache,
+  subscribeToLists,
+} from "@/lib/listsStore";
 import type { PackingList } from "@/lib/types";
-
-/* Lists live in localStorage; useSyncExternalStore bridges them into React
-   without hydration mismatches (server has no localStorage, so the server
-   snapshot is always empty — mirrors the pattern in ThemeProvider). The
-   snapshot is cached so repeated calls return the same reference until
-   invalidateListsCache() runs, as required by useSyncExternalStore. */
-const EMPTY_LISTS: PackingList[] = [];
-let cachedLists: PackingList[] | null = null;
-let listeners: ReadonlyArray<() => void> = [];
-
-function getListsSnapshot(): PackingList[] {
-  if (cachedLists === null) cachedLists = loadState().lists;
-  return cachedLists;
-}
-
-function getServerListsSnapshot(): PackingList[] {
-  return EMPTY_LISTS;
-}
-
-function subscribeToLists(listener: () => void): () => void {
-  listeners = [...listeners, listener];
-  return () => {
-    listeners = listeners.filter((l) => l !== listener);
-  };
-}
-
-function invalidateListsCache(): void {
-  cachedLists = null;
-  for (const listener of listeners) listener();
-}
 
 function sortLists(lists: PackingList[]): PackingList[] {
   return [...lists].sort((a, b) => {
