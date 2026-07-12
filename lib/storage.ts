@@ -157,3 +157,103 @@ export function toggleItemDone(
   );
   saveState({ ...state, lists });
 }
+
+function updateGroupIn(
+  state: AppState,
+  listId: string,
+  groupId: string,
+  update: (group: Group) => Group,
+): AppState {
+  return {
+    ...state,
+    lists: state.lists.map((list) =>
+      list.id === listId
+        ? {
+            ...list,
+            groups: list.groups.map((group) =>
+              group.id === groupId ? update(group) : group,
+            ),
+          }
+        : list,
+    ),
+  };
+}
+
+function updateItemIn(
+  state: AppState,
+  listId: string,
+  groupId: string,
+  itemId: string,
+  update: (item: Item) => Item,
+): AppState {
+  return updateGroupIn(state, listId, groupId, (group) => ({
+    ...group,
+    items: group.items.map((item) => (item.id === itemId ? update(item) : item)),
+  }));
+}
+
+export function updateItemText(
+  listId: string,
+  groupId: string,
+  itemId: string,
+  text: string,
+): void {
+  saveState(
+    updateItemIn(loadState(), listId, groupId, itemId, (item) => ({
+      ...item,
+      text,
+    })),
+  );
+}
+
+export function deleteItem(
+  listId: string,
+  groupId: string,
+  itemId: string,
+): void {
+  saveState(
+    updateGroupIn(loadState(), listId, groupId, (group) => ({
+      ...group,
+      items: group.items.filter((item) => item.id !== itemId),
+    })),
+  );
+}
+
+export function toggleItemQuantityEnabled(
+  listId: string,
+  groupId: string,
+  itemId: string,
+): void {
+  saveState(
+    updateItemIn(loadState(), listId, groupId, itemId, (item) => ({
+      ...item,
+      quantityEnabled: !item.quantityEnabled,
+    })),
+  );
+}
+
+export function incrementItemQuantity(
+  listId: string,
+  groupId: string,
+  itemId: string,
+): void {
+  saveState(
+    updateItemIn(loadState(), listId, groupId, itemId, (item) => ({
+      ...item,
+      quantity: item.quantity + 1,
+    })),
+  );
+}
+
+export function decrementItemQuantity(
+  listId: string,
+  groupId: string,
+  itemId: string,
+): void {
+  saveState(
+    updateItemIn(loadState(), listId, groupId, itemId, (item) => ({
+      ...item,
+      quantity: Math.max(1, item.quantity - 1),
+    })),
+  );
+}

@@ -1,10 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { ItemEditor } from "@/components/ItemEditor";
 import { ItemRow } from "@/components/ItemRow";
 import { invalidateListsCache } from "@/lib/listsStore";
 import { PALETTE_BG_CLASS } from "@/lib/palette";
-import { addItem, toggleItemDone } from "@/lib/storage";
+import {
+  addItem,
+  decrementItemQuantity,
+  deleteItem,
+  incrementItemQuantity,
+  toggleItemDone,
+  toggleItemQuantityEnabled,
+  updateItemText,
+} from "@/lib/storage";
 import type { Group } from "@/lib/types";
 
 interface GroupSectionProps {
@@ -14,6 +23,7 @@ interface GroupSectionProps {
 
 export function GroupSection({ group, listId }: GroupSectionProps) {
   const [text, setText] = useState("");
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -24,8 +34,34 @@ export function GroupSection({ group, listId }: GroupSectionProps) {
     setText("");
   }
 
-  function handleToggle(itemId: string) {
+  function handleToggleDone(itemId: string) {
     toggleItemDone(listId, group.id, itemId);
+    invalidateListsCache();
+  }
+
+  function handleTextChange(itemId: string, value: string) {
+    updateItemText(listId, group.id, itemId, value);
+    invalidateListsCache();
+  }
+
+  function handleDelete(itemId: string) {
+    deleteItem(listId, group.id, itemId);
+    invalidateListsCache();
+    setEditingItemId(null);
+  }
+
+  function handleToggleQuantityEnabled(itemId: string) {
+    toggleItemQuantityEnabled(listId, group.id, itemId);
+    invalidateListsCache();
+  }
+
+  function handleIncrement(itemId: string) {
+    incrementItemQuantity(listId, group.id, itemId);
+    invalidateListsCache();
+  }
+
+  function handleDecrement(itemId: string) {
+    decrementItemQuantity(listId, group.id, itemId);
     invalidateListsCache();
   }
 
@@ -42,13 +78,31 @@ export function GroupSection({ group, listId }: GroupSectionProps) {
         <p className="text-foreground/60 mt-2 text-sm">Još nema stavki.</p>
       ) : (
         <div className="divide-foreground/10 mt-2 flex flex-col divide-y">
-          {group.items.map((item) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              onToggle={() => handleToggle(item.id)}
-            />
-          ))}
+          {group.items.map((item) =>
+            item.id === editingItemId ? (
+              <ItemEditor
+                key={item.id}
+                item={item}
+                onTextChange={(value) => handleTextChange(item.id, value)}
+                onDelete={() => handleDelete(item.id)}
+                onToggleQuantityEnabled={() =>
+                  handleToggleQuantityEnabled(item.id)
+                }
+                onIncrement={() => handleIncrement(item.id)}
+                onDecrement={() => handleDecrement(item.id)}
+                onClose={() => setEditingItemId(null)}
+              />
+            ) : (
+              <ItemRow
+                key={item.id}
+                item={item}
+                onToggleDone={() => handleToggleDone(item.id)}
+                onEdit={() => setEditingItemId(item.id)}
+                onIncrement={() => handleIncrement(item.id)}
+                onDecrement={() => handleDecrement(item.id)}
+              />
+            ),
+          )}
         </div>
       )}
 
