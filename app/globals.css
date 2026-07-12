@@ -40,3 +40,60 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* Short press feedback across the app — buttons and checkboxes should
+   feel tactile on click/tap, not just change state instantly. */
+button,
+input[type="checkbox"] {
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease,
+    background-color 150ms ease;
+}
+button:active:not(:disabled),
+input[type="checkbox"]:active {
+  transform: scale(0.93);
+}
+
+/* Fade + scale open/close for native <dialog> modals. transition-behavior:
+   allow-discrete defers the UA's display:none until the transition finishes,
+   so the close animation is actually visible instead of being skipped. */
+.pk-dialog {
+  opacity: 0;
+  transform: scale(0.95);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    overlay 180ms ease allow-discrete,
+    display 180ms ease allow-discrete;
+}
+
+.pk-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@starting-style {
+  .pk-dialog[open] {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.pk-dialog::backdrop {
+  opacity: 0;
+  transition:
+    opacity 180ms ease,
+    overlay 180ms ease allow-discrete,
+    display 180ms ease allow-discrete;
+}
+
+.pk-dialog[open]::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .pk-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}

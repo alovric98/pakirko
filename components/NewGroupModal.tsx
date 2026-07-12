@@ -83,7 +83,7 @@ export function NewGroupModal({
       ref={dialogRef}
       onClose={handleNativeClose}
       onClick={handleDialogClick}
-      className="bg-background text-foreground rounded-card max-h-[85vh] w-[min(24rem,90vw)] overflow-y-auto border-none p-0 shadow-xl backdrop:bg-black/40"
+      className="pk-dialog bg-background text-foreground rounded-card fixed inset-0 m-auto max-h-[85vh] w-[min(24rem,90vw)] overflow-y-auto border-none p-0 shadow-xl backdrop:bg-black/40"
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-6">
         <h2 className="text-xl font-bold">Nova grupa</h2>

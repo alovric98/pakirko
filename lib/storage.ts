@@ -257,3 +257,45 @@ export function decrementItemQuantity(
     })),
   );
 }
+
+export function moveItem(
+  listId: string,
+  itemId: string,
+  toGroupId: string,
+  toIndex: number,
+): void {
+  const state = loadState();
+  let moved: Item | undefined;
+  const withoutItem = state.lists.map((list) => {
+    if (list.id !== listId) return list;
+    return {
+      ...list,
+      groups: list.groups.map((group) => {
+        const idx = group.items.findIndex((item) => item.id === itemId);
+        if (idx === -1) return group;
+        moved = group.items[idx];
+        return { ...group, items: group.items.filter((item) => item.id !== itemId) };
+      }),
+    };
+  });
+  if (!moved) return;
+  const lists = withoutItem.map((list) => {
+    if (list.id !== listId) return list;
+    return {
+      ...list,
+      groups: list.groups.map((group) =>
+        group.id === toGroupId
+          ? {
+              ...group,
+              items: [
+                ...group.items.slice(0, toIndex),
+                moved!,
+                ...group.items.slice(toIndex),
+              ],
+            }
+          : group,
+      ),
+    };
+  });
+  saveState({ ...state, lists });
+}
