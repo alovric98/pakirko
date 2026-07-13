@@ -125,26 +125,30 @@ export function GroupSection({
   const overIndex = dragState?.overIndex ?? -1;
   const draggedId = dragState?.itemId;
 
-  const nodes: React.ReactNode[] = [];
+  /* The indicator is rendered INSIDE each item's own (stably-keyed) wrapper
+     rather than as a sibling that changes position in the array. Repositioning
+     a sibling element within a keyed list can make React unmount/remount the
+     surrounding items on larger reorders, which drops setPointerCapture mid-
+     gesture and freezes the drag (see Faza 6 reverse-drag bug). Item wrappers
+     always stay in group.items order — only which one *shows* the indicator
+     changes. */
   let nonDraggedSeen = 0;
-  let indicatorInserted = false;
-
+  let indicatorPlaced = false;
+  const itemNodes: React.ReactNode[] = [];
   for (const item of group.items) {
     const isDraggedItem = item.id === draggedId;
-    if (isOverThisGroup && !indicatorInserted && !isDraggedItem && nonDraggedSeen === overIndex) {
-      nodes.push(<InsertionIndicator key="drop-indicator" />);
-      indicatorInserted = true;
-    }
-    nodes.push(
+    const showIndicatorBefore =
+      isOverThisGroup && !indicatorPlaced && !isDraggedItem && nonDraggedSeen === overIndex;
+    if (showIndicatorBefore) indicatorPlaced = true;
+    if (!isDraggedItem) nonDraggedSeen += 1;
+    itemNodes.push(
       <div key={item.id} data-item-id={item.id}>
+        {showIndicatorBefore && <InsertionIndicator />}
         {renderRow(item)}
       </div>,
     );
-    if (!isDraggedItem) nonDraggedSeen += 1;
   }
-  if (isOverThisGroup && !indicatorInserted) {
-    nodes.push(<InsertionIndicator key="drop-indicator" />);
-  }
+  const showIndicatorAtEnd = isOverThisGroup && !indicatorPlaced;
 
   return (
     <section
@@ -160,7 +164,8 @@ export function GroupSection({
         <p className="text-foreground/60 mt-2 text-sm">Još nema stavki.</p>
       ) : (
         <div className="divide-foreground/10 mt-2 flex flex-col divide-y">
-          {nodes}
+          {itemNodes}
+          {showIndicatorAtEnd && <InsertionIndicator />}
         </div>
       )}
 
