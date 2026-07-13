@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { ListCard } from "@/components/ListCard";
 import { NewListModal } from "@/components/NewListModal";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   getListsSnapshot,
   getServerListsSnapshot,
@@ -34,14 +35,17 @@ export default function Home() {
     <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-6 py-12">
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Pakirko 🧳</h1>
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          aria-label="Novi popis"
-          className="bg-foreground text-background flex h-10 w-10 items-center justify-center rounded-full text-xl font-semibold"
-        >
-          +
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            aria-label="Novi popis"
+            className="bg-foreground text-background flex h-10 w-10 items-center justify-center rounded-full text-xl font-semibold"
+          >
+            +
+          </button>
+        </div>
       </header>
 
       {sortedLists.length === 0 ? (
