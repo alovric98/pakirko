@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
+import { DuplicateListModal } from "@/components/DuplicateListModal";
 import { ListCard } from "@/components/ListCard";
 import { NewListModal } from "@/components/NewListModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -28,6 +30,8 @@ export default function Home() {
     getServerListsSnapshot,
   );
   const [modalOpen, setModalOpen] = useState(false);
+  const [copyingList, setCopyingList] = useState<PackingList | null>(null);
+  const router = useRouter();
 
   const sortedLists = sortLists(lists);
 
@@ -64,7 +68,7 @@ export default function Home() {
       ) : (
         <div className="flex flex-col gap-3">
           {sortedLists.map((list) => (
-            <ListCard key={list.id} list={list} />
+            <ListCard key={list.id} list={list} onCopy={setCopyingList} />
           ))}
         </div>
       )}
@@ -73,6 +77,16 @@ export default function Home() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onCreate={() => invalidateListsCache()}
+      />
+
+      <DuplicateListModal
+        list={copyingList}
+        open={copyingList !== null}
+        onClose={() => setCopyingList(null)}
+        onCreate={(newList) => {
+          invalidateListsCache();
+          router.push(`/popis/${newList.id}`);
+        }}
       />
     </main>
   );

@@ -88,6 +88,44 @@ export function getListById(id: string): PackingList | undefined {
   return loadState().lists.find((list) => list.id === id);
 }
 
+export function duplicateList(
+  sourceListId: string,
+  input: {
+    name: string;
+    emoji: string;
+    color: PaletteColor;
+    tripDate: string | null;
+    resetQuantities: boolean;
+  },
+): PackingList | undefined {
+  const state = loadState();
+  const source = state.lists.find((list) => list.id === sourceListId);
+  if (!source) return undefined;
+  const newList: PackingList = {
+    id: crypto.randomUUID(),
+    name: input.name,
+    emoji: input.emoji,
+    color: input.color,
+    tripDate: input.tripDate,
+    createdAt: new Date().toISOString(),
+    groups: source.groups.map((group) => ({
+      id: crypto.randomUUID(),
+      name: group.name,
+      emoji: group.emoji,
+      color: group.color,
+      items: group.items.map((item) => ({
+        id: crypto.randomUUID(),
+        text: item.text,
+        done: false,
+        quantityEnabled: item.quantityEnabled,
+        quantity: input.resetQuantities ? 1 : item.quantity,
+      })),
+    })),
+  };
+  saveState({ ...state, lists: [...state.lists, newList] });
+  return newList;
+}
+
 export function addGroup(
   listId: string,
   input: { name: string; emoji: string; color: PaletteColor },

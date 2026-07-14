@@ -10,7 +10,7 @@ import {
 import { addList } from "@/lib/storage";
 import type { PackingList } from "@/lib/types";
 
-const EMOJI_OPTIONS = [
+export const EMOJI_OPTIONS = [
   "🧳",
   "✈️",
   "🏖️",
