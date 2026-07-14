@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EditGroupModal } from "@/components/EditGroupModal";
 import { ItemEditor } from "@/components/ItemEditor";
 import { ItemRow } from "@/components/ItemRow";
 import { invalidateListsCache } from "@/lib/listsStore";
@@ -50,6 +51,7 @@ export function GroupSection({
 }: GroupSectionProps) {
   const [text, setText] = useState("");
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editGroupOpen, setEditGroupOpen] = useState(false);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -155,10 +157,22 @@ export function GroupSection({
       data-group-id={group.id}
       className={`${PALETTE_BG_CLASS[group.color]} rounded-card px-5 py-4`}
     >
-      <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => setEditGroupOpen(true)}
+        className="flex min-w-0 items-center gap-2 text-left"
+      >
         <span className="text-xl">{group.emoji}</span>
         <h2 className="truncate font-semibold">{group.name}</h2>
-      </div>
+      </button>
+
+      <EditGroupModal
+        open={editGroupOpen}
+        onClose={() => setEditGroupOpen(false)}
+        onUpdate={() => invalidateListsCache()}
+        listId={listId}
+        group={group}
+      />
 
       {group.items.length === 0 && !isOverThisGroup ? (
         <p className="text-foreground/60 mt-2 text-sm">Još nema stavki.</p>

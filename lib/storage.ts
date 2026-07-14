@@ -145,6 +145,20 @@ export function addGroup(
   return group;
 }
 
+export function updateGroup(
+  listId: string,
+  groupId: string,
+  input: { name: string; emoji: string; color: PaletteColor },
+): Group {
+  let updated: Group | undefined;
+  const state = updateGroupIn(loadState(), listId, groupId, (group) => {
+    updated = { ...group, ...input };
+    return updated;
+  });
+  saveState(state);
+  return updated!;
+}
+
 export function addItem(listId: string, groupId: string, text: string): Item {
   const item: Item = {
     id: crypto.randomUUID(),
