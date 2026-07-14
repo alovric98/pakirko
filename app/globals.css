@@ -17,11 +17,11 @@
 .dark {
   --background: #12161f;
   --foreground: #e9edf5;
-  --card-sand: #46402f;
-  --card-peach: #4e3e2b;
-  --card-sky: #2b3e52;
-  --card-lavender: #43324e;
-  --card-mint: #2e4638;
+  --card-sand: #4c432f;
+  --card-peach: #664024;
+  --card-sky: #284562;
+  --card-lavender: #532f65;
+  --card-mint: #2b5440;
 }
 
 @theme inline {
